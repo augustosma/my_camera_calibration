@@ -18,7 +18,8 @@ class ImageConverter
 	my_camera_calibration::CamCalib cam_calib_;
 
 	public:
-	ImageConverter() : it_(nh_) ,cam_calib_()
+	ImageConverter()
+		: it_(nh_) ,cam_calib_()
 	{
 		// Subscrive to input video feed and publish output video feed
 		image_sub_ = it_.subscribe("/cam0/image_raw", 1,
@@ -61,16 +62,15 @@ class ImageConverter
 			cv::Mat intrinsic_matrix, distortion_coeffs;
 			cam_calib_.calibrate(intrinsic_matrix, distortion_coeffs);
 
-			std::cout << " *** DONE!\n\nReprojection error is " //<< err
+			cout << " *** DONE!\n\nReprojection error is " //<< err
 				<< "\nStoring Intrinsics.xml and Distortions.xml files\n\n";
 
 			std::cout << "intrinsic_matrix" << intrinsic_matrix << "\n"
 				<<"distortion_coeffs" << distortion_coeffs << "\n";
 
 
-			cv::FileStorage fs("cam_calib.yml", cv::FileStorage::WRITE);
-			/* ESTRUTURA DA MENSAGEM
-			   
+			cv::FileStorage fs("intrinsics.xml", cv::FileStorage::WRITE);
+			/*
 			   std_msgs/Header header
 			   uint32 height
 			   uint32 width
@@ -84,13 +84,9 @@ class ImageConverter
 			   sensor_msgs/RegionOfInterest roi
 			   */
 			
-			fs << "image_width" << cam_calib_.image_size.width;
-			fs << "image_height" << cam_calib_.image_size.height;
-			fs << "camera_matrix" << intrinsic_matrix; 
-			fs << "distortion_coefficients" << distortion_coeffs;
-			fs << "rectification_matrix" << "" ;
-			fs << "projection_matrix" << "";
-			fs << "distortion_model" << "";		
+			fs << //"image_width" << image_size.width << "image_height" << image_size.height
+				"camera_matrix" << intrinsic_matrix << "distortion_coefficients"
+				<< distortion_coeffs;
 			fs.release();
 
 		}

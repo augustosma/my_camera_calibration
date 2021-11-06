@@ -19,7 +19,10 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-find_package(OpenCV 4.4.0 REQUIRED PATHS "/home/name/build")
+#find_package(OpenCV 4.4.0 REQUIRED PATHS "/home/name/build")
+find_package(OpenCV 3.2.0 REQUIRED)
+message("OpenCV version: ${OpenCV_VERSION}")
+
 find_package(Eigen3 REQUIRED)
 
 

@@ -47,6 +47,37 @@ public:
 
 private:
 
-};
-}
+};//class CamCalib
+
+class StereoCalib
+{
+private:
+	float image_sf = 0.5f;      // image scaling factor
+    //float delay = 1.f;
+    int board_w = 6;
+    int board_h = 7;
+
+    //board_w = atoi(argv[1]);
+    //board_h = atoi(argv[2]);
+    //n_boards = atoi(argv[3]);
+    int board_n = board_w * board_h;
+    cv::Size board_sz = cv::Size(board_w, board_h);
+    cv::Size imageSize;
+	vector<cv::Point3f> boardModel;
+
+	const float squareSize = 1.f;
+	vector< vector<cv::Point3f> > objectPoints;
+	vector< vector<cv::Point2f> > points[2];    
+
+	enum{left=0,right=1};
+
+public:
+	StereoCalib();
+	~StereoCalib();
+	void sendImage(cv::Mat&,cv::Mat&);
+	void calibrate(cv::Mat& M1,cv::Mat& D1,cv::Mat& M2,cv::Mat& D2,cv::Mat& R,cv::Mat& T,cv::Mat& E,cv::Mat& F);
+	
+};//class StereoCalib
+
+}//namespace
 #endif

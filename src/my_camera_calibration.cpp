@@ -110,11 +110,12 @@ void CamCalib::calibrate(cv::Mat& intrinsic_matrix,cv::Mat& distortion_coeffs){
                 );
 
     // SAVE THE INTRINSICS AND DISTORTIONS
-    cout << " *** DONE!\n\nReprojection error is " << err
+/*    cout << " *** DONE!\n\nReprojection error is " << err
          << "\nStoring Intrinsics.xml and Distortions.xml files\n\n";
     
     cout << "intrinsic_matrix" << intrinsic_matrix << "\n"
     	<<"distortion_coeffs" << distortion_coeffs << "\n";
+*/
     //cv::FileStorage fs("intrinsics.xml", cv::FileStorage::WRITE);
     //cout << fs.isOpened();
     //fs << "qualquer coisa teste";
@@ -161,6 +162,66 @@ void CamCalib::calibrate(cv::Mat& intrinsic_matrix,cv::Mat& distortion_coeffs){
 */
 
 }//calibrate
+
+StereoCalib::StereoCalib()
+{
+	//board_n = 
+	for (int i = 0; i < board_h; i++)//(i = 0; i < ny; i++)
+    	for (int j = 0; j < board_w; j++)//(j = 0; j < nx; j++)
+      		boardModel.push_back(cv::Point3f((float)(i * squareSize), (float)(j * squareSize), 0.f));
+}
+
+StereoCalib::~StereoCalib()
+{
+
+}
+
+void StereoCalib::sendImage(cv::Mat& image_l, cv::Mat& image_r)
+{
+    imageSize = image_l.size();
+    bool found[2] = {false,false};
+   	vector<cv::Point2f> corners[2];
+   	
+	//if left and right are both found
+	if (found[0] = cv::findChessboardCorners(image_l, board_sz, corners[0]) )
+	{
+		if (!(found[1] = cv::findChessboardCorners(image_r, board_sz, corners[1]) ))
+			return;
+	}
+	else
+		return;
+		
+	cv::Mat mcorners_l(corners[0]);
+	cv::Mat mcorners_r(corners[1]);
+	//maybe rescaling needed
+	
+	drawChessboardCorners(image_l, board_sz, corners[0], found[0]);
+	drawChessboardCorners(image_r, board_sz, corners[1], found[1]);
+	
+	objectPoints.push_back(boardModel);
+	points[0].push_back(corners[0]);
+	points[1].push_back(corners[1]);
+	//
+}
+
+void StereoCalib::calibrate(cv::Mat& M1,cv::Mat& D1,cv::Mat& M2,cv::Mat& D2,cv::Mat& R,cv::Mat& T,cv::Mat& E,cv::Mat& F)
+{
+	std::cout <<"\nStereo calibration running...\n";
+	
+	cv::stereoCalibrate(
+		objectPoints,
+		points[1],
+		points[2],
+		M1,D1,M2,D2,
+		imageSize,
+		R,T,E,F,
+		cv::CALIB_FIX_ASPECT_RATIO | cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_SAME_FOCAL_LENGTH,
+		cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 100, 1e-5)
+		);	
+
+}
+
+
 
 }//namespace
 
